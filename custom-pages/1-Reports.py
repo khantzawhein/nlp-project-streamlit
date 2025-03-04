@@ -26,7 +26,7 @@ def render():
     st.text("All reports:")
     if df.empty:
         st.warning("No reports found.")
-        return
+        st.stop()
     st.dataframe(df[["job_id", "model", "text"]], hide_index=True)
 
     st.divider()
@@ -74,12 +74,6 @@ def render():
             plt.title("Sentiment Distribution")
             sentiment_df["sentiment"].value_counts().plot(kind="bar")
             st.pyplot(plt, clear_figure=True)
-
-
-
-
-
-
 
     else:
         st.warning("Sentiment analysis has not been completed yet.")

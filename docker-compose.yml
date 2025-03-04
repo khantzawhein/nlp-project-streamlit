@@ -6,6 +6,10 @@ services:
   streamlit:
     image: ghcr.io/khantzawhein/nlp-project:latest
     container_name: streamlit
+    restart: unless-stopped
+    depends_on:
+        - mongodb
+        - redis
     networks:
       - nlp-project
     ports:
@@ -14,9 +18,11 @@ services:
       - "MONGO_URI=mongodb://root:B0d9LvwuUHXn91DU7DiX0k4@mongodb:27017"
       - "REDIS_URI=redis://redis:6379"
       - "MONGO_DB=text_analysis_db"
+    entrypoint: "streamlit run main.py --server.port=8501 --server.address=0.0.0.0"
   mongodb:
     image: mongo:latest
     container_name: mongodb
+    restart: unless-stopped
     networks:
       - nlp-project
     volumes:
@@ -30,14 +36,19 @@ services:
     container_name: redis
     networks:
       - nlp-project
-    restart: always
+    restart: unless-stopped
     volumes:
       - ./docker-data/redis:/data
   worker:
     image: ghcr.io/khantzawhein/nlp-project:latest
+    restart: unless-stopped
     container_name: worker
     networks:
       - nlp-project
     depends_on:
       - redis
-    command: celery -A tasks.analyze_text worker --loglevel=INFO
+    environment:
+      - "MONGO_URI=mongodb://root:B0d9LvwuUHXn91DU7DiX0k4@mongodb:27017"
+      - "REDIS_URI=redis://redis:6379"
+      - "MONGO_DB=text_analysis_db"
+    entrypoint: celery -A tasks.analyze_text worker --loglevel=INFO

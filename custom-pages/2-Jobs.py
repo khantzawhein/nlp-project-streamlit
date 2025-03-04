@@ -12,13 +12,12 @@ db = get_db()
 jobCollection = db["jobs"]
 jobs = jobCollection.find().sort({"_id": -1}).to_list()
 
-# Print background running jobs from Mongo DB as table
-
 st.title('Background Jobs')
 
-# Get all jobs from MongoDB
+if len(jobs) == 0:
+    st.warning("No Jobs Found")
+    st.stop()
 
-# Print table with job id, status, and start time
 
 st.dataframe(pd.DataFrame({
     "Text": [job["text"] for job in jobs],
