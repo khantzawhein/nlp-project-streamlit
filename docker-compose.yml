@@ -1,0 +1,13 @@
+services:
+  streamlit:
+    image: ghcr.io/khantzawhein/nlp-project:latest
+    container_name: streamlit
+    ports:
+      - "8501:8501"
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./data/db:/data/db

@@ -1,0 +1,23 @@
+[client]
+showSidebarNavigation = true
+toolbarMode = "developer"
+
+[theme]
+
+# Dark mode for a sleek UI
+base = "dark"
+
+# Vibrant blue accent for interactive elements
+primaryColor = "#1E88E5"
+
+# Deep navy background for a premium feel
+backgroundColor = "#121826"
+
+# Slightly lighter sidebar for contrast
+secondaryBackgroundColor = "#1C2333"
+
+# Soft white text for readability
+textColor = "#E3EAF2"
+
+# Clean sans-serif font for a modern touch
+font = "sans serif"

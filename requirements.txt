@@ -1,0 +1,11 @@
+pymongo
+celery
+flair
+transformers
+streamlit
+networkx
+plotly
+pyvis
+pandas
+matplotlib
+wordcloud
