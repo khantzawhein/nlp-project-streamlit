@@ -9,6 +9,9 @@ from flair.splitter import SegtokSentenceSplitter
 from db.mongo import get_db
 from tasks.analyze_custom_model import analyze_text as analyze_custom_model
 from string import punctuation
+from dotenv import load_dotenv
+import os
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +20,7 @@ analysis_collection = db["analysis_results"]
 sentiment_collection = db["sentiment_results"]
 jobCollection = db["jobs"]
 
-app = Celery('analyze_tasks', backend="redis://localhost:6379/3", broker='redis://localhost:6379/3')
+app = Celery('analyze_tasks', backend=os.getenv("REDIS_URI"), broker=os.getenv("REDIS_URI"))
 
 
 @app.task

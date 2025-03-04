@@ -1,13 +1,43 @@
+networks:
+  nlp-project:
+    driver: bridge
+
 services:
   streamlit:
     image: ghcr.io/khantzawhein/nlp-project:latest
     container_name: streamlit
+    networks:
+      - nlp-project
     ports:
       - "8501:8501"
+    environment:
+      - "MONGO_URI=mongodb://root:B0d9LvwuUHXn91DU7DiX0k4@mongodb:27017"
+      - "REDIS_URI=redis://redis:6379"
+      - "MONGO_DB=text_analysis_db"
   mongodb:
     image: mongo:latest
     container_name: mongodb
-    ports:
-      - "27017:27017"
+    networks:
+      - nlp-project
     volumes:
-      - ./data/db:/data/db
+      - ./docker-data/db:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: "B0d9LvwuUHXn91DU7DiX0k4"
+      MONGO_INITDB_DATABASE: "text_analysis_db"
+  redis:
+    image: redis:latest
+    container_name: redis
+    networks:
+      - nlp-project
+    restart: always
+    volumes:
+      - ./docker-data/redis:/data
+  worker:
+    image: ghcr.io/khantzawhein/nlp-project:latest
+    container_name: worker
+    networks:
+      - nlp-project
+    depends_on:
+      - redis
+    command: celery -A tasks.analyze_text worker --loglevel=INFO
