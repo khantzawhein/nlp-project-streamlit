@@ -42,7 +42,7 @@ def render():
     st.write(f"Selected report: {job_id}")
 
     report = collection.find_one({"job_id": ObjectId(job_id)})
-    if report:
+    if report and "analysis" in report and len(report["analysis"]) > 0:
         analysis = report["analysis"]
 
         with st.expander("Original Text"):
@@ -50,7 +50,7 @@ def render():
 
         ner_analysis(analysis, report)
     else:
-        st.warning("Analysis has not been completed yet.")
+        st.warning("There is no result for this analysis.")
 
     st.markdown(f"<h4>Sentiment Analysis: </h4>", unsafe_allow_html=True)
 
