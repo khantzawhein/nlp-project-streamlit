@@ -6,14 +6,21 @@ from celery import Celery
 import logging
 from flair.nn import Classifier
 from flair.splitter import SegtokSentenceSplitter
-from db.mongo import get_db
+from pymongo import MongoClient
+
 from tasks.analyze_custom_model import analyze_text as analyze_custom_model
 from string import punctuation
 from dotenv import load_dotenv
 import os
+
 load_dotenv()
 
 logger = logging.getLogger(__name__)
+
+
+def get_db():
+    db_client = MongoClient(os.getenv("MONGO_URI"))
+    return db_client[os.getenv("MONGO_DB")]
 
 db = get_db()
 analysis_collection = db["analysis_results"]
@@ -21,7 +28,6 @@ sentiment_collection = db["sentiment_results"]
 jobCollection = db["jobs"]
 
 app = Celery('analyze_tasks', backend=os.getenv("REDIS_URI"), broker=os.getenv("REDIS_URI"))
-
 
 @app.task
 def analyze_text(text, job_id):
