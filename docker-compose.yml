@@ -18,6 +18,10 @@ services:
       - "MONGO_URI=mongodb://root:B0d9LvwuUHXn91DU7DiX0k4@mongodb:27017"
       - "REDIS_URI=redis://redis:6379"
       - "MONGO_DB=text_analysis_db"
+    volumes:
+      - ./app:/app
+      - ./ner_model:/app/ner_model
+      - ./docker-data/flair:/root/.flair
     entrypoint: "streamlit run main.py --server.port=8501 --server.address=0.0.0.0"
   mongodb:
     image: mongo:latest
@@ -47,6 +51,10 @@ services:
       - nlp-project
     depends_on:
       - redis
+    volumes:
+      - ./app:/app
+      - ./ner_model:/app/ner_model
+      - ./docker-data/flair:/root/.flair
     environment:
       - "MONGO_URI=mongodb://root:B0d9LvwuUHXn91DU7DiX0k4@mongodb:27017"
       - "REDIS_URI=redis://redis:6379"

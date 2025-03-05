@@ -22,20 +22,13 @@ def get_db():
     db_client = MongoClient(os.getenv("MONGO_URI"))
     return db_client[os.getenv("MONGO_DB")]
 
-db = get_db()
-analysis_collection = db["analysis_results"]
-sentiment_collection = db["sentiment_results"]
-jobCollection = db["jobs"]
 
 app = Celery('analyze_tasks', backend=os.getenv("REDIS_URI"), broker=os.getenv("REDIS_URI"))
 
 @app.task
 def analyze_text(text, job_id):
-    logger.info(f"job_id: {job_id}")
-    jobCollection.update_one({"_id": job_id}, {"$set": {"status_ner": "Running"}})
+    analysis_collection, sentiment_collection, job_collection, sentences = prepare_analyzing(job_id, text)
     result = []
-    splitter = SegtokSentenceSplitter()
-    sentences = splitter.split(text)
     tagger = Classifier.load('ner')
     tagger.predict(sentences, mini_batch_size=64)
     for sentence in sentences:
@@ -54,20 +47,29 @@ def analyze_text(text, job_id):
     }
     analysis_collection.insert_one(document)
 
-    jobCollection.update_one({"_id": ObjectId(job_id)},
+    job_collection.update_one({"_id": ObjectId(job_id)},
                              {"$set": {"status_ner": "Completed", "end_time": datetime.now()}})
 
     logger.info(f"Analysis of text '{text}' has been completed")
 
 
-@app.task
-def analyze_sentiment_text(text, job_id):
+def prepare_analyzing(job_id, text):
+    db = get_db()
+    analysis_collection = db["analysis_results"]
+    sentiment_collection = db["sentiment_results"]
+    job_collection = db["jobs"]
     logger.info(f"job_id: {job_id}")
-    jobCollection.update_one({"_id": job_id}, {"$set": {"status_sentiment": "Running"}})
+    job_collection.update_one({"_id": job_id}, {"$set": {"status_ner": "Running"}})
 
-    result = []
     splitter = SegtokSentenceSplitter()
     sentences = splitter.split(text)
+    return analysis_collection, sentiment_collection, job_collection, sentences
+
+
+@app.task
+def analyze_sentiment_text(text, job_id):
+    analysis_collection, sentiment_collection, job_collection, sentences = prepare_analyzing(job_id, text)
+    result = []
     sentiment = Classifier.load('sentiment')
     sentiment.predict(sentences, mini_batch_size=64)
 
@@ -87,7 +89,7 @@ def analyze_sentiment_text(text, job_id):
 
     sentiment_collection.insert_one(document)
 
-    jobCollection.update_one({"_id": ObjectId(job_id)},
+    job_collection.update_one({"_id": ObjectId(job_id)},
                              {"$set": {"status_sentiment": "Completed", "end_time": datetime.now()}})
 
     logger.info(f"Sentiment analysis of text '{text}' has been completed")
@@ -95,8 +97,8 @@ def analyze_sentiment_text(text, job_id):
 
 @app.task
 def analyze_text_using_custom_model(text, job_id):
-    logger.info(f"job_id: {job_id}")
-    jobCollection.update_one({"_id": job_id}, {"$set": {"status_ner": "Running"}})
+    analysis_collection, sentiment_collection, job_collection, sentences = prepare_analyzing(job_id, text)
+    job_collection.update_one({"_id": job_id}, {"$set": {"status_ner": "Running"}})
     result = []
     splitter = SegtokSentenceSplitter()
     sentences = splitter.split(text)
@@ -118,7 +120,7 @@ def analyze_text_using_custom_model(text, job_id):
         "analysis": result
     })
 
-    jobCollection.update_one({"_id": ObjectId(job_id)},
+    job_collection.update_one({"_id": ObjectId(job_id)},
                              {"$set": {"status_ner": "Completed", "end_time": datetime.now()}})
 
 
