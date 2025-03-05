@@ -62,18 +62,13 @@ def render():
         sentiment_df = pd.DataFrame(sentiment_report['sentiment'])
         st.write(sentiment_df)
         col1, col2 = st.columns(2)
+        sentiment_val_count = sentiment_df["sentiment"].value_counts()
         with col1:
-            plt.figure(figsize=(6, 6))
-            plt.title("Sentiment Pie Chart")
-            sentiment_df["sentiment"].value_counts().plot(kind="pie", autopct="%1.1f%%", startangle=140,
-                                                          colors=["#ff9999", "#66b3ff", "#99ff99"])
-            st.pyplot(plt, clear_figure=True)
+            fig = px.pie(sentiment_val_count, title="Sentiment Pie Chart", names=sentiment_val_count.index, values=sentiment_val_count.values, width=600, height=500)
+            st.plotly_chart(fig, clear_figure=True)
         with col2:
-            # Bar Chart
-            plt.figure(figsize=(6, 6))
-            plt.title("Sentiment Distribution")
-            sentiment_df["sentiment"].value_counts().plot(kind="bar")
-            st.pyplot(plt, clear_figure=True)
+            fig = px.bar(sentiment_val_count, x=sentiment_val_count.index, y=sentiment_val_count.values, width=600, height=500, title="Sentiment Distribution")
+            st.plotly_chart(fig, clear_figure=True)
 
     else:
         st.warning("Sentiment analysis has not been completed yet.")
@@ -103,10 +98,8 @@ def ner_analysis(analysis, report):
 
 
 def get_entity_bar_chart(entity_count):
-    plt.figure(figsize=(6, 6))
-    plt.title("Top Entities by Frequency")
-    entity_count.head(10).plot(kind="bar")
-    st.pyplot(plt, clear_figure=True)
+    fig = px.bar(entity_count.head(10), x=entity_count.head(10).index, y=entity_count.head(10).values, width=600, height=500, title="Top Entities by Frequency")
+    st.plotly_chart(fig)
 
 
 def get_sunburst_chart(analysis_df, report, type_count):
@@ -126,11 +119,8 @@ def get_word_cloud(analysis_df):
 
 
 def get_entity_type_distribution_chart(type_count):
-    plt.figure(figsize=(6, 6))
-    plt.title("Entity Type Distribution")
-    type_count.plot(kind="pie", autopct="%1.1f%%", startangle=140,
-                    colors=["#ff9999", "#66b3ff", "#99ff99"])
-    st.pyplot(plt, clear_figure=True)
+    fig = px.pie(type_count, title="Entity Type Distribution", names=type_count.index, values=type_count.values, width=600, height=500)
+    st.plotly_chart(fig)
 
 
 render()

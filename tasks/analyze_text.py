@@ -106,8 +106,7 @@ def analyze_text_using_custom_model(text, job_id):
         raw_result = analyze_custom_model(sentence.text)
         for word, label in raw_result:
             # Remove word starting with [ and ending with ] and remove punct
-            if re.match(r"^\[.*\]$", word) or any(char in word for char in punctuation):
-                logger.info(f"Skipping word: {word}")
+            if re.match(r"^\[.*\]$", word) or any(char in word for char in punctuation) or label == "O":
                 continue
             result.append({
                 "type": label.removeprefix("B-").removeprefix("I-"),
@@ -122,8 +121,3 @@ def analyze_text_using_custom_model(text, job_id):
 
     job_collection.update_one({"_id": ObjectId(job_id)},
                              {"$set": {"status_ner": "Completed", "end_time": datetime.now()}})
-
-
-if __name__ == "__main__":
-    print(analyze_text_using_custom_model("Michael graduated from MIT in 2010. The MIT university is in Paris and USA",
-                                          "1"))
