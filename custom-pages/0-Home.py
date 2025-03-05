@@ -20,6 +20,9 @@ with st.form(clear_on_submit=True, key="1"):
     text = st.text_area("Enter text to analyze:", placeholder="Enter text here")
     selected_model = st.radio("Select Model", ("Flair", "Custom Trained"))
     if st.form_submit_button(':rocket: **Analyze**'):
+        if len(text.strip().split(" ")) < 4:
+            noti_box.error("Please enter at least 4 words to analyze.", icon="⚠️")
+            st.stop()
         result = collection.insert_one({
             "text": text,
             "model": selected_model,
