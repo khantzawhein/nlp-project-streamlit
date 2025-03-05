@@ -22,8 +22,8 @@ if len(jobs) == 0:
 st.dataframe(pd.DataFrame({
     "Text": [job["text"] for job in jobs],
     "Model": [job["model"] for job in jobs],
-    "Status (NER)": [job["status_ner"] if "status_ner" in job else "Not Running" for job in jobs],
-    "Status (Sentiment)": [job["status_ner"] for job in jobs],
+    "Status (NER)": [job["status_ner"] for job in jobs],
+    "Status (Sentiment)": [job["status_sentiment"] for job in jobs],
     "Action": [f"/reports?id={str(job['_id'])}" for job in jobs],
 }), column_config={
     "Action": st.column_config.LinkColumn(

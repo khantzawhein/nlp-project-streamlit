@@ -30,7 +30,7 @@ def read_conll_file(file_path):
 
 def analyze_text(sentence):
     named_entities = extract_named_entities(sentence)
-    print("Named Entities - Example 1:", named_entities)
+    print("Named Entities: ", named_entities)
     return named_entities
 
 
