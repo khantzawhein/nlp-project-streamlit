@@ -24,7 +24,7 @@ st.dataframe(pd.DataFrame({
     "Model": [job["model"] for job in jobs],
     "Status (NER)": [job["status_ner"] if "status_ner" in job else "Not Running" for job in jobs],
     "Status (Sentiment)": [job["status_ner"] for job in jobs],
-    "Action": [f"/reports?id={str(job["_id"])}" for job in jobs],
+    "Action": [f"/reports?id={str(job['_id'])}" for job in jobs],
 }), column_config={
     "Action": st.column_config.LinkColumn(
         display_text="Open Report",

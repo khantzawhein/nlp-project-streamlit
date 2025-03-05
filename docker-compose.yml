@@ -4,7 +4,7 @@ networks:
 
 services:
   streamlit:
-    image: ghcr.io/khantzawhein/nlp-project:latest
+    image: ghcr.io/khantzawhein/nlp-project-streamlit:latest
     container_name: streamlit
     restart: unless-stopped
     depends_on:
@@ -40,7 +40,7 @@ services:
     volumes:
       - ./docker-data/redis:/data
   worker:
-    image: ghcr.io/khantzawhein/nlp-project:latest
+    image: ghcr.io/khantzawhein/nlp-project-streamlit:latest
     restart: unless-stopped
     container_name: worker
     networks:
